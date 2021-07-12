@@ -79,6 +79,7 @@
 					AM.Crossed(src)
 			if(is_new_area && is_destination_turf)
 				destination.loc.Entered(src, origin)
+	SSdemo.mark_dirty(src)
 	return 1
 
 //called when src is thrown into hit_atom

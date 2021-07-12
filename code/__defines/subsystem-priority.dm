@@ -10,6 +10,7 @@
 #define SS_PRIORITY_CHAT		   100
 
 // Normal
+#define SS_PRIORITY_DEMO           200	// Replays
 #define SS_PRIORITY_TICKER         100	// Gameticker.
 #define SS_PRIORITY_MOB            95	// Mob Life().
 #define SS_PRIORITY_MACHINERY      95	// Machinery + powernet ticks.
