@@ -259,7 +259,7 @@
 
 /datum/reagent/paracetamol/overdose(mob/living/carbon/M, alien)
 	M.add_chemical_effect(CE_TOXIN, 1)
-	M.druggy = max(M.druggy, 2)
+	M.make_drugged(2)
 	M.add_chemical_effect(CE_PAINKILLER, 10)
 
 /datum/reagent/tramadol
@@ -273,9 +273,10 @@
 	metabolism = 0.05
 	ingest_met = 0.02
 	flags = IGNORE_MOB_SIZE
-	var/pain_power = 120 //magnitide of painkilling effect
+	var/pain_power = 100 //magnitide of painkilling effect
 	var/effective_dose = 0.5 //how many units it need to process to reach max power
 	var/soft_overdose = 15 //determines when it starts causing negative effects w/out actually causing OD
+	var/additiction_coef = 0.8
 
 /datum/reagent/tramadol/affect_blood(mob/living/carbon/M, alien, removed)
 	var/effectiveness = 1
@@ -293,7 +294,7 @@
 /datum/reagent/tramadol/overdose(mob/living/carbon/M, alien)
 	..()
 	M.hallucination(120, 30)
-	M.druggy = max(M.druggy, 10)
+	M.make_drugged(10)
 	M.add_chemical_effect(CE_PAINKILLER, pain_power*0.5) //extra painkilling for extra trouble
 	M.add_chemical_effect(CE_BREATHLOSS, 0.6) //Have trouble breathing, need more air
 	if(isboozed(M))
@@ -325,15 +326,6 @@
 			if(booze.strength < 40) //liquor stuff hits harder
 				return 2
 
-/datum/reagent/tramadol/oxycodone
-	name = "Oxycodone"
-	description = "An effective and very addictive painkiller. Don't mix with alcohol."
-	taste_description = "bitterness"
-	color = "#800080"
-	overdose = 20
-	pain_power = 200
-	effective_dose = 2
-
 /datum/reagent/tramadol/opium // yes, opium is a subtype of tramadol, for reasons ~Toby
 	name = "Opium"
 	description = "Latex obtained from the opium poppy. An effective, but addictive painkiller."
@@ -344,8 +336,9 @@
 	scannable = 0
 	reagent_state = SOLID
 	data = 0
-	pain_power = 150
+	pain_power = 120
 	var/drugdata = 0
+	additiction_coef = 2.1
 
 /datum/reagent/tramadol/opium/affect_blood(mob/living/carbon/M, alien, removed)
 	var/effectiveness = 1
@@ -372,7 +365,7 @@
 	var/whole_volume = (volume + M.chem_doses[type]) // side effects are more robust (dose-wise) than in the case of *legal* painkillers usage
 	if(whole_volume > soft_overdose)
 		M.add_chemical_effect(CE_SLOWDOWN, 1)
-		M.druggy = max(M.druggy, 10)
+		M.make_drugged(10)
 		if(prob(1))
 			M.slurring = max(M.slurring, 10)
 	if(whole_volume > (overdose+soft_overdose)/2)
@@ -385,28 +378,30 @@
 		if(prob(1))
 			M.Weaken(2)
 			M.drowsyness = max(M.drowsyness, 5)
+	M.make_jittery(whole_volume * 0.5)
 
-/datum/reagent/tramadol/opium/tarine
-	name = "Tarine"
+/datum/reagent/tramadol/opium/heroin
+	name = "Heroin"
 	description = "An opioid most commonly used as a recreational drug for its euphoric effects. An extremely effective painkiller, yet is terribly addictive and notorious for its life-threatening side-effects."
 	color = "#b79a8d"
 	overdose = 15
 	soft_overdose = 7.5
-	pain_power = 240
+	pain_power = 220
 	scannable = 0
 	reagent_state = SOLID
+	additiction_coef = 3
 
-/datum/reagent/tramadol/opium/tarine/affect_blood(mob/living/carbon/M, alien, removed)
+/datum/reagent/tramadol/opium/heroin/affect_blood(mob/living/carbon/M, alien, removed)
 	..()
 	M.add_chemical_effect(CE_SLOWDOWN, 1)
 
-/datum/reagent/tramadol/opium/tarine/handle_painkiller_overdose(mob/living/carbon/M)
+/datum/reagent/tramadol/opium/heroin/handle_painkiller_overdose(mob/living/carbon/M)
 	var/whole_volume = (volume + M.chem_doses[type]) // side effects are more robust (dose-wise) than in the case of *legal* painkillers usage
 	if(whole_volume > soft_overdose)
 		M.hallucination(30, 30)
 		M.eye_blurry = max(M.eye_blurry, 10)
 		M.drowsyness = max(M.drowsyness, 5)
-		M.druggy = max(M.druggy, 10)
+		M.make_drugged(10)
 		M.add_chemical_effect(CE_SLOWDOWN, 2)
 		if(prob(5))
 			M.slurring = max(M.slurring, 20)
@@ -417,8 +412,68 @@
 		if(prob(25))
 			M.sleeping = max(M.sleeping, 3)
 		M.add_chemical_effect(CE_BREATHLOSS, 0.2)
+	M.make_jittery(whole_volume * 0.5)
+
+/datum/reagent/tramadol/opium/kodein
+	name = "Heroin"
+	description = "An mild opium alkaloid most commonly used as basis of other opiates."
+	color = "#b79abd"
+	overdose = 15
+	soft_overdose = 7.5
+	pain_power = 80
+	scannable = 1
+	reagent_state = SOLID
+	additiction_coef = 3
+
+/datum/reagent/tramadol/opium/heroin/krokodil
+	name = "Krokodil"
+	description = "A drug most commonly used as a cheap replacement of heroin."
+	color = "#b7ba8d"
+	overdose = 15
+	soft_overdose = 7.5
+	pain_power = 150
+	scannable = 1
+	reagent_state = SOLID
+	additiction_coef = 2.6
+
+/datum/reagent/tramadol/opium/morphine
+	name = "Morphine"
+	description = "An opioid painkiller drug."
+	color = "#aaaabb"
+	overdose = 25
+	soft_overdose = 15
+	scannable = 1
+	reagent_state = SOLID
+	data = 0
+	pain_power = 200
+	additiction_coef = 2
+
+/datum/reagent/tramadol/opium/oxycodone
+	name = "Oxycodone"
+	description = "An effective opiat painkiller. Don't mix with alcohol."
+	taste_description = "bitterness"
+	color = "#800080"
+	overdose = 20
+	pain_power = 180
+	effective_dose = 2
+	additiction_coef = 2
 
 /* Other medicine */
+
+/datum/reagent/naloxone
+	name = "Naloxone"
+	description = "Naloxone is used to treat withdrawal. Very toxic."
+	taste_description = "bitterness"
+	reagent_state = LIQUID
+	color = "#99bbaa"
+	metabolism = REM * 0.05
+	overdose = 5
+	scannable = 1
+
+/datum/reagent/naloxone/affect_blood(mob/living/carbon/M, alien, removed)
+	if(prob(1))
+		M.add_chemical_effect(CE_TOXIN, 1)
+		M.add_chemical_effect(CE_BREATHLOSS, rand(0.1, 0.2))
 
 /datum/reagent/synaptizine
 	name = "Synaptizine"
@@ -438,6 +493,8 @@
 	M.AdjustStunned(-1)
 	M.AdjustWeakened(-1)
 	holder.remove_reagent(/datum/reagent/mindbreaker, 5)
+	for(var/T in typesof(/datum/reagent/tramadol/opium))
+		holder.remove_reagent(T, 1)
 	M.adjust_hallucination(-10)
 	M.add_chemical_effect(CE_MIND, 2)
 	M.adjustToxLoss(5 * removed) // It used to be incredibly deadly due to an oversight. Not anymore!
@@ -873,7 +930,7 @@
 /datum/reagent/antidexafen/overdose(mob/living/carbon/M, alien)
 	M.add_chemical_effect(CE_TOXIN, 1)
 	M.hallucination(60, 20)
-	M.druggy = max(M.druggy, 2)
+	M.make_drugged(2)
 
 /datum/reagent/adrenaline
 	name = "Adrenaline"
@@ -947,7 +1004,7 @@
 		M.add_chemical_effect(CE_PAINKILLER, 85)
 		M.drowsyness = max(M.drowsyness, 10)
 		if(prob(30))
-			M.druggy = max(M.druggy, 6)
+			M.make_drugged(6)
 		if(prob(5))
 			M.emote(pick("cough", "giggle", "laugh"))
 		if(world.time > data + ANTIDEPRESSANT_MESSAGE_DELAY)
@@ -965,9 +1022,9 @@
 		M.nutrition -= 20 * removed
 		M.add_chemical_effect(CE_PAINKILLER, 50)
 		if(prob(15))
-			M.druggy = max(M.druggy, 2)
+			M.make_drugged(2)
 		if(prob(5))
-			M.druggy = max(M.druggy, 4)
+			M.make_drugged(4)
 			M.emote(pick("cough", "giggle"))
 		if(world.time > data + ANTIDEPRESSANT_MESSAGE_DELAY)
 			data = world.time
@@ -984,9 +1041,9 @@
 		M.nutrition -= 10 * removed
 		M.add_chemical_effect(CE_PAINKILLER, 25)
 		if(prob(10))
-			M.druggy = max(M.druggy, 2)
+			M.make_drugged(2)
 		if(prob(4))
-			M.druggy = max(M.druggy, 3)
+			M.make_drugged(3)
 			M.emote(pick("cough"))
 		if(world.time > data + ANTIDEPRESSANT_MESSAGE_DELAY)
 			data = world.time
@@ -1003,7 +1060,7 @@
 		M.nutrition -= 3 * removed
 		M.add_chemical_effect(CE_PAINKILLER, 5)
 		if(prob(3))
-			M.druggy = max(M.druggy, 2)
+			M.make_drugged(2)
 			M.emote(pick("cough"))
 		if(world.time > data + ANTIDEPRESSANT_MESSAGE_DELAY)
 			data = world.time
