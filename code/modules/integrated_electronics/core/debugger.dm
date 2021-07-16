@@ -28,7 +28,7 @@
 			new_data = sanitize(user.get_input("Now type in a string", "[src] string writing", null, MOB_INPUT_TEXT, src), trim = 0)
 			if(istext(new_data) && user.IsAdvancedToolUser())
 				data_to_write = new_data
-				to_chat(user, SPAN_NOTICE("You set \the [src]'s memory to \"[new_data]\"."))
+				to_chat(user, SPAN("notice", "You set \the [src]'s memory to \"[new_data]\"."))
 		if("number")
 			accepting_refs = FALSE
 			copy_values = FALSE
@@ -36,47 +36,42 @@
 			new_data = input(user, "Now type in a number.","[src] number writing") as null|num
 			if(isnum_safe(new_data) && user.IsAdvancedToolUser())
 				data_to_write = new_data
-				to_chat(user, SPAN_NOTICE("You set \the [src]'s memory to [new_data]."))
+				to_chat(user, SPAN("notice", "You set \the [src]'s memory to [new_data]."))
 		if("ref")
 			accepting_refs = TRUE
 			copy_values = FALSE
 			copy_id = FALSE
-			to_chat(user, SPAN_NOTICE("You turn \the [src]'s ref scanner on.  Slide it across \
-			an object for a ref of that object to save it in memory."))
+			to_chat(user, SPAN("danger", "You turn \the [src]'s ref scanner on.  Slide it across an object for a ref of that object to save it in memory."))
 		if("copy")
 			accepting_refs = FALSE
 			copy_values = TRUE
 			copy_id = FALSE
-			to_chat(user, SPAN_NOTICE("You turn \the [src]'s value copier on.  Use it on a pin \
-			to save its current value in memory."))
+			to_chat(user, SPAN("danger", "You turn \the [src]'s value copier on.  Use it on a pin to save its current value in memory."))
 		if("null")
 			data_to_write = null
 			copy_values = FALSE
-			to_chat(user, SPAN_NOTICE("You set \the [src]'s memory to absolutely nothing."))
+			to_chat(user, SPAN("notice", "You set \the [src]'s memory to absolutely nothing."))
 		if("id lock")
 			accepting_refs = FALSE
 			copy_values = FALSE
 			copy_id = TRUE
-			to_chat(user, SPAN_NOTICE("You turn \the [src]'s id card scanner on. Use your own card \
-			to store the identity and id-lock an assembly."))
+			to_chat(user, SPAN("danger", "You turn \the [src]'s id card scanner on. Use your own card to store the identity and id-lock an assembly."))
 
 /obj/item/device/integrated_electronics/debugger/afterattack(atom/target, mob/living/user, proximity)
 	. = ..()
 	if(accepting_refs && proximity)
 		data_to_write = weakref(target)
-		visible_message(SPAN_NOTICE("[user] slides \a [src]'s over \the [target]."))
-		to_chat(user, SPAN_NOTICE("You set \the [src]'s memory to a reference to [target.name] \[Ref\].  The ref scanner is \
-		now off."))
+		visible_message(SPAN("notice", "[user] slides \a [src]'s over \the [target]."))
+		to_chat(user, SPAN("danger", "You set \the [src]'s memory to a reference to [target.name] \[Ref\]. The ref scanner is now off."))
 		accepting_refs = FALSE
 
 	else if(copy_id && proximity)
 		if(istype(target,/obj/item/weapon/card/id))
 			src.idlock = weakref(target)
-			to_chat(user, SPAN_NOTICE("You set \the [src]'s card memory to [target.name].  The id card scanner is \
-			now off."))
+			to_chat(user, SPAN("danger", "You set \the [src]'s card memory to [target.name]. The id card scanner is now off."))
 
 		else
-			to_chat(user, SPAN_NOTICE("You turn the id card scanner is off."))
+			to_chat(user, SPAN("notice", "You turn the id card scanner is off."))
 
 		copy_id = FALSE
 		return
@@ -87,7 +82,7 @@
 		//If the debugger is set to copy, copy the data in the pin onto it
 		if(copy_values)
 			data_to_write = io.data
-			to_chat(user, SPAN_NOTICE("You let the debugger copy the data."))
+			to_chat(user, SPAN("notice", "You let the debugger copy the data."))
 			copy_values = FALSE
 			return
 
@@ -99,11 +94,11 @@
 			var/weakref/W = data_to_write
 			var/atom/A = W.resolve()
 			data_to_show = A.name
-		to_chat(user, SPAN_NOTICE("You write '[data_to_write ? data_to_show : "NULL"]' to the '[io]' pin of \the [io.holder]."))
+		to_chat(user, SPAN("notice", "You write '[data_to_write ? data_to_show : "NULL"]' to the '[io]' pin of \the [io.holder]."))
 
 	//If the pin can only be pulsed
 	else if(io.io_type == PULSE_CHANNEL)
 		SScircuit_components.queue_component(io.holder, TRUE, io.ord, TRUE) //ignore_power = TRUE
-		to_chat(user, SPAN_NOTICE("You pulse \the [io.holder]'s [io]."))
+		to_chat(user, SPAN("notice", "You pulse \the [io.holder]'s [io]."))
 
   io.holder.interact(user) // This is to update the UI.

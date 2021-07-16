@@ -202,24 +202,3 @@
 #define JOINTEXT(X) jointext(X, null)
 
 #define SPAN(class, X) "<span class='" + ##class + "'>" + ##X + "</span>"
-
-#define SPAN_NOTICE(X)   SPAN("notice", X)
-
-#define SPAN_WARNING(X)  SPAN("warning", X)
-
-#define SPAN_DANGER(X)   SPAN("danger", X)
-
-#define SPAN_OCCULT(X)   SPAN("cult", X)
-
-#define SPAN_DEADSAY(X)  SPAN("deadsay", X)
-
-#define FONT_SMALL(X)    SPAN("small", X)
-
-#define FONT_NORMAL(X)   SPAN("normal", X)
-
-#define FONT_LARGE(X)    SPAN("large", X)
-
-#define FONT_HUGE(X)     SPAN("huge", X)
-
-#define FONT_GIANT(X)    SPAN("giant", X)
-

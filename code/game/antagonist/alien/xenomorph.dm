@@ -44,6 +44,30 @@ GLOBAL_DATUM_INIT(xenomorphs, /datum/antagonist/xenos, new)
 	show_objectives_at_creation(player)
 	return TRUE
 
+/datum/antagonist/xenos/greet(datum/mind/player)
+	to_chat(player.current, SPAN("danger", "<font size=3>You are a [role_text]!</font>"))
+	if(ishuman(player.current))
+		to_chat(player.current, SPAN("notice", "Hiss! You are a xenomorph! Do everything you can to make sure the hive thriving!"))
+	else
+		to_chat(player.current, SPAN("notice", "[welcome_text]"))
+	if(config.objectives_disabled == CONFIG_OBJECTIVE_NONE || !player.objectives.len)
+		to_chat(player.current, SPAN("notice", "[antag_text]"))
+
+	show_objectives_at_creation(player)
+	return TRUE
+
+/datum/antagonist/xenos/greet(datum/mind/player)
+	to_chat(player.current, SPAN("danger", "<font size=3>You are a [role_text]!</font>"))
+	if(ishuman(player.current))
+		to_chat(player.current, SPAN("notice", "Hiss! You are a xenomorph! Do everything you can to make sure the hive thriving!"))
+	else
+		to_chat(player.current, SPAN("notice", "[welcome_text]"))
+	if(config.objectives_disabled == CONFIG_OBJECTIVE_NONE || !player.objectives.len)
+		to_chat(player.current, SPAN("notice", "[antag_text]"))
+
+	show_objectives_at_creation(player)
+	return TRUE
+
 /datum/antagonist/xenos/attempt_random_spawn()
 	if(config.aliens_allowed) ..()
 
